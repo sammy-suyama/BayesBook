@@ -1,11 +1,11 @@
 ###################################
-## Demo script for Bayesian PCA
+## Demo script for Bayesian Dimensionality Reduction
 
 using PyPlot, PyCall
 @pyimport sklearn.datasets as datasets
 
 push!(LOAD_PATH,".")
-import PCA
+import DimensionalityReduction
 
 function load_facedata(skip::Int)
     face = datasets.fetch_olivetti_faces()
@@ -91,11 +91,11 @@ function test_face_missing()
     for d in 1 : D
         Sigma_W[:,:,d] = 0.1 * eye(M)
     end
-    prior = PCA.PCAModel(D, M, sigma2_y, zeros(M, D), Sigma_W, zeros(D), Sigma_mu)
+    prior = DimensionalityReduction.DRModel(D, M, sigma2_y, zeros(M, D), Sigma_W, zeros(D), Sigma_mu)
 
     # learn & generate
     max_iter = 100
-    posterior, X_est = PCA.VI(deepcopy(Y_obs), prior, max_iter)
+    posterior, X_est = DimensionalityReduction.VI(deepcopy(Y_obs), prior, max_iter)
     Y_est = posterior.m_W'*X_est + repmat(posterior.m_mu, 1, size(X_est, 2))
     Y_itp = deepcopy(Y_obs)
     Y_itp[mask] = Y_est[mask]
@@ -146,11 +146,11 @@ function test_iris()
     for d in 1 : D
         Sigma_W[:,:,d] = 0.1 * eye(M)
     end
-    prior = PCA.PCAModel(D, M, sigma2_y, zeros(M, D), Sigma_W, zeros(D), Sigma_mu)
+    prior = DimensionalityReduction.DRModel(D, M, sigma2_y, zeros(M, D), Sigma_W, zeros(D), Sigma_mu)
         
     # learn & generate
     max_iter = 100
-    posterior, X_est = PCA.VI(deepcopy(Y_obs), prior, max_iter)
+    posterior, X_est = DimensionalityReduction.VI(deepcopy(Y_obs), prior, max_iter)
 
     # visualize
     figure("2D plot")
@@ -173,11 +173,11 @@ function test_iris()
     for d in 1 : D
         Sigma_W[:,:,d] = 0.1 * eye(M)
     end
-    prior = PCA.PCAModel(D, M, sigma2_y, zeros(M, D), Sigma_W, zeros(D), Sigma_mu)
+    prior = DimensionalityReduction.DRModel(D, M, sigma2_y, zeros(M, D), Sigma_W, zeros(D), Sigma_mu)
         
     # learn & generate
     max_iter = 100
-    posterior, X_est = PCA.VI(deepcopy(Y_obs), prior, max_iter)
+    posterior, X_est = DimensionalityReduction.VI(deepcopy(Y_obs), prior, max_iter)
 
     # visualize
     figure("3D plot")
