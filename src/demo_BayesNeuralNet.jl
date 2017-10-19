@@ -36,6 +36,7 @@ function sample_test()
     ratey = (ylim()[2] - ylim()[1]) * 0.1
     ratex = (xlim()[2] - xlim()[1]) * 0.1
     text(xlim()[1] + ratex, ylim()[2] - ratey, @sprintf("K=%d", K), fontsize=18)
+    show()
 end
 
 """
@@ -91,7 +92,8 @@ function test()
     xlim([xmin, xmax])
     xlabel("x")
     ylabel("y")
+    show()
 end
 
-sample_test()
-#test()
+#sample_test()
+test()

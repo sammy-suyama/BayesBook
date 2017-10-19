@@ -93,6 +93,7 @@ function test_1D()
     plot(VB)
     ylabel("ELBO")
     xlabel("iterations")
+    show()
 end
 
 """
@@ -130,6 +131,7 @@ function test_2D()
     plot(VB)
     ylabel("ELBO")
     xlabel("iterations")
+    show()
 end
 
 test_1D()

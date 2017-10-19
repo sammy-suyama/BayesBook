@@ -31,6 +31,7 @@ function visualize_2D(X::Matrix{Float64}, S::Matrix{Float64}, S_est::Matrix{Floa
     end
 
     ax2[:set_title]("estimation")
+    show()
 end
 
 """
@@ -70,6 +71,7 @@ function test_2D()
     plot(VB)
     ylabel("ELBO")
     xlabel("iterations")
+    show()
 end
 
 test_2D()

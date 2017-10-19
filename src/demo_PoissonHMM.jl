@@ -57,6 +57,7 @@ function test_comparison()
     subplot(3,1,1);plot(X);ylabel("data")
     subplot(3,1,2);fill_between(1:N, reshape(Z_est_hmm[1,:]', N), zeros(N));ylim([0.0, 1.0]);ylabel("S (PHMM)")
     subplot(3,1,3);fill_between(1:N, reshape(Z_est_pmm[1,:]', N), zeros(N));ylim([0.0, 1.0]);ylabel("S (PMM)")
+    show()
 end
 
 test_comparison()

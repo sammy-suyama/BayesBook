@@ -37,5 +37,3 @@ legend(["model1","model2","data"], loc="upper left", fontsize=16)
 xlabel("\$x\$", fontsize=20)
 ylabel("\$y\$", fontsize=20)
 show()
-
-

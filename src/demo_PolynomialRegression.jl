@@ -82,6 +82,7 @@ function test()
         ylim([y_min, y_max])
         text(x_max - 2.5, y_max - 1, @sprintf("M=%d", dims[k]))
     end
+    show()
 end
 
 test()

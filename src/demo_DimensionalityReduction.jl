@@ -33,7 +33,6 @@ function visualize(Y::Array{Float64,2}, L::Int)
         idx2 = L*mod(n-1, base)+1 : L*(mod(n-1, base) + 1)
         pic[idx1,idx2] = reshape(Y[:,n], L, L)
     end
-    
     imshow(pic, cmap=ColorMap("gray"))
 end
 
@@ -122,6 +121,7 @@ function test_face_missing()
     clf()
     visualize(Y[:,1:N_show], L)
     title("Truth")
+    show()
 end
 
 """
@@ -189,6 +189,7 @@ function test_iris()
     xlabel("\$x_1\$", fontsize=20)
     ylabel("\$x_2\$", fontsize=20)
     zlabel("\$x_3\$", fontsize=20)
+    show()
 end
 
 #test_face_missing()

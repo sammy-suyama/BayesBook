@@ -117,6 +117,7 @@ function main_VI()
     plot(1:max_iter, KL)
     ylabel("KL divergence", fontsize=16)
     xlabel("iteration", fontsize=16)
+    show()
 end
 
 """
@@ -172,6 +173,7 @@ function main_GS()
     plot(1:max_iter, KL)
     ylabel("KL divergence", fontsize=16)
     xlabel("sample size", fontsize=16)
+    show()
 end
 
 main_VI()

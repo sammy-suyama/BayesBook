@@ -58,3 +58,4 @@ for k in 1 : K
     xlim([0,N])
     ylim([0, ylim()[2]])
 end
+show()
