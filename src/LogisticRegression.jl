@@ -37,7 +37,7 @@ Compute variational parameters.
 """
 function VI(Y, X, M, Sigma_w, alpha, max_iter)
     function rho2sig(rho)
-        return log(1 + exp.(rho))
+        return log.(1 + exp.(rho))
     end
     
     function compute_df_dw(Y, X, Sigma_w, mu, rho, W)
@@ -65,12 +65,12 @@ function VI(Y, X, M, Sigma_w, alpha, max_iter)
 
     # diag gaussian for approximate posterior
     mu = randn(M)
-    rho = randn(M) # sigma = log(1 + exp.(rho))
+    rho = randn(M) # sigma = log.(1 + exp.(rho))
     
     for i in 1 : max_iter
         # sample epsilon
         ep = rand(M)
-        W_tmp = mu + log(1 + exp.(rho)) .* ep
+        W_tmp = mu + log.(1 + exp.(rho)) .* ep
 
         # calculate gradient
         df_dw = compute_df_dw(Y, X, Sigma_w, mu, rho, W_tmp)

@@ -138,7 +138,7 @@ function update_Z(bhmm::BHMM, X::Vector{Float64}, Z::Matrix{Float64})
 
     ln_lkh = zeros(K, N)
     for k in 1 : K
-        ln_lambda = digamma.(bhmm.cmp[k].a) - log(bhmm.cmp[k].b)
+        ln_lambda = digamma.(bhmm.cmp[k].a) - log.(bhmm.cmp[k].b)
         lambda = bhmm.cmp[k].a / bhmm.cmp[k].b
         for n in 1 : N
             ln_lkh[k,n] = X[n]'*(ln_lambda) - lambda
@@ -151,7 +151,7 @@ function update_Z(bhmm::BHMM, X::Vector{Float64}, Z::Matrix{Float64})
     end
 
     # copy
-    ln_expt_Z = log(Z)
+    ln_expt_Z = log.(Z)
     
     # n = 1
     ln_expt_Z[:,1] = (digamma.(bhmm.alpha_phi) - digamma.(sum(bhmm.alpha_phi))
@@ -215,7 +215,7 @@ function update_Z_fb(bhmm::BHMM, X::Vector{Float64})
     # calc likelihood
     ln_lik = zeros(K, N)
     for k in 1 : K
-        ln_lambda = digamma.(bhmm.cmp[k].a) - log(bhmm.cmp[k].b)
+        ln_lambda = digamma.(bhmm.cmp[k].a) - log.(bhmm.cmp[k].b)
         lambda = bhmm.cmp[k].a / bhmm.cmp[k].b
         for n in 1 : N
             ln_lik[k,n] =X[n]'*(ln_lambda) - lambda                

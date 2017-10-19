@@ -99,7 +99,7 @@ function calc_ELBO(X::Matrix{Float64}, pri::BPMM, pos::BPMM)
     expt_lambda = zeros(D, K)
     expt_ln_lkh = 0
     for k in 1 : K
-        expt_ln_lambda[:,k] = digamma.(pos.cmp[k].a) - log(pos.cmp[k].b)
+        expt_ln_lambda[:,k] = digamma.(pos.cmp[k].a) - log.(pos.cmp[k].b)
         expt_lambda[:,k] = pos.cmp[k].a / pos.cmp[k].b
         for n in 1 : N
             expt_ln_lkh += expt_S[k,n] * (X[:, n]' * expt_ln_lambda[:,k]
@@ -112,7 +112,7 @@ function calc_ELBO(X::Matrix{Float64}, pri::BPMM, pos::BPMM)
     
     KL_lambda = 0
     for k in 1 : K
-        KL_lambda += (sum(pos.cmp[k].a)*log(pos.cmp[k].b) - sum(pri.cmp[k].a)*log(pri.cmp[k].b)
+        KL_lambda += (sum(pos.cmp[k].a)*log.(pos.cmp[k].b) - sum(pri.cmp[k].a)*log.(pri.cmp[k].b)
                       - sum(lgamma.(pos.cmp[k].a)) + sum(lgamma.(pri.cmp[k].a))
                       + (pos.cmp[k].a - pri.cmp[k].a)' * expt_ln_lambda[:,k]
                       + (pri.cmp[k].b - pos.cmp[k].b) * sum(expt_lambda[:,k])
@@ -158,7 +158,7 @@ function update_S(bpmm::BPMM, X::Matrix{Float64})
         tmp[k] = - sum(bpmm.cmp[k].a) / bpmm.cmp[k].b
         tmp[k] += digamma.(bpmm.alpha[k]) - sum_digamma_tmp
     end
-    ln_lambda_X = [X'*(digamma.(bpmm.cmp[k].a) - log(bpmm.cmp[k].b)) for k in 1 : K]
+    ln_lambda_X = [X'*(digamma.(bpmm.cmp[k].a) - log.(bpmm.cmp[k].b)) for k in 1 : K]
     for n in 1 : N
         tmp_ln_pi =  [tmp[k] + ln_lambda_X[k][n] for k in 1 : K]
         ln_expt_S[:,n] = tmp_ln_pi - logsumexp(tmp_ln_pi)
@@ -185,8 +185,8 @@ function sample_S_GS(pmm::PMM, X::Matrix{Float64})
     K = pmm.K
     S = zeros(K, N)
 
-    tmp = [-sum(pmm.cmp[k].lambda) + log(pmm.phi[k]) for k in 1 : K]
-    ln_lambda_X = [X'*log(pmm.cmp[k].lambda) for k in 1 : K]
+    tmp = [-sum(pmm.cmp[k].lambda) + log.(pmm.phi[k]) for k in 1 : K]
+    ln_lambda_X = [X'*log.(pmm.cmp[k].lambda) for k in 1 : K]
     for n in 1 : N
         tmp_ln_phi = [(tmp[k] + ln_lambda_X[k][n])::Float64 for k in 1 : K]
         tmp_ln_phi = tmp_ln_phi - logsumexp(tmp_ln_phi)
@@ -198,16 +198,16 @@ end
 ####################
 ## used for Collapsed Gibbs Sampling
 function calc_ln_NB(Xn::Vector{Float64}, gam::Gam)
-    ln_lkh = [(gam.a[d]*log(gam.b)
+    ln_lkh = [(gam.a[d]*log.(gam.b)
                - lgamma.(gam.a[d])
                + lgamma.(Xn[d] + gam.a[d])
-               - (Xn[d] + gam.a[d])*log(gam.b + 1)
+               - (Xn[d] + gam.a[d])*log.(gam.b + 1)
                )::Float64 for d in 1 : size(Xn, 1)]
     return sum(ln_lkh)
 end
 
 function sample_Sn(Xn::Vector{Float64}, bpmm::BPMM)
-    ln_tmp = [(calc_ln_NB(Xn, bpmm.cmp[k]) + log(bpmm.alpha[k])) for k in 1 : bpmm.K]
+    ln_tmp = [(calc_ln_NB(Xn, bpmm.cmp[k]) + log.(bpmm.alpha[k])) for k in 1 : bpmm.K]
     ln_tmp = ln_tmp -  logsumexp(ln_tmp)
     Sn = categorical_sample(exp.(ln_tmp))
     return Sn

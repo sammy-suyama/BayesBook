@@ -30,7 +30,7 @@ function visualize_surface(mu, rho, X, Y, text)
     val = [x1grid[:] x2grid[:]]'
 
     z_list = []
-    sigma = log(1 + exp.(rho))
+    sigma = log.(1 + exp.(rho))
     for n in 1 : N
         W = rand(MvNormal(mu, diagm(sigma.^2)))
         z_tmp = [LogisticRegression.sigmoid(W'*val[:,i]) for i in 1 : size(val, 2)]
@@ -70,7 +70,7 @@ function visualize_contour(mu, rho, X, Y)
 
     z_list = []
     W_list = []
-    sigma = log(1 + exp.(rho))
+    sigma = log.(1 + exp.(rho))
     for n in 1 : N
         W = rand(MvNormal(mu, diagm(sigma.^2)))
         z_tmp = [LogisticRegression.sigmoid(W'*val[:,i]) for i in 1 : size(val, 2)]

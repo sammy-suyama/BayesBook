@@ -100,7 +100,7 @@ end
 function calc_ELBO(X::Array{Float64, 2}, pri::BGMM, pos::BGMM)
     function logCw(nu, W)
         D = size(W, 1)
-        return -0.5*nu*logdet(W) - 0.5*nu*D*log(2) - 0.25*D*(D-1)*log(pi) - sum([lgamma.(0.5*(nu+1-d)) for d in 1 : D])
+        return -0.5*nu*logdet(W) - 0.5*nu*D*log.(2) - 0.25*D*(D-1)*log.(pi) - sum([lgamma.(0.5*(nu+1-d)) for d in 1 : D])
     end
     
     ln_expt_S = update_S(pos, X)
@@ -113,7 +113,7 @@ function calc_ELBO(X::Array{Float64, 2}, pri::BGMM, pos::BGMM)
         expt_Lambda = pos.cmp[k].nu * pos.cmp[k].W
         expt_Lambda_mu = pos.cmp[k].nu * pos.cmp[k].W * pos.cmp[k].m
         expt_mu_Lambda_mu = (pos.cmp[k].nu * pos.cmp[k].m' * pos.cmp[k].W * pos.cmp[k].m)[1] + D/pos.cmp[k].beta
-        expt_ln_Lambda = sumdigamma(pos.cmp[k].nu, D) + D*log(2) + logdet(pos.cmp[k].W)
+        expt_ln_Lambda = sumdigamma(pos.cmp[k].nu, D) + D*log.(2) + logdet(pos.cmp[k].W)
         expt_ln_pi = digamma.(pos.alpha) - digamma.(sum(pos.alpha))
         for n in 1 : N
             # <ln p(X|S, mu, Lambda)>
@@ -121,7 +121,7 @@ function calc_ELBO(X::Array{Float64, 2}, pri::BGMM, pos::BGMM)
                                                - 2*(X[:,n]'*expt_Lambda_mu)[1]
                                                + expt_mu_Lambda_mu
                                                - expt_ln_Lambda
-                                               + D * log(2*pi)
+                                               + D * log.(2*pi)
                                                )
             # <ln p(S|pi)>
             expt_ln_lkh += expt_S[k,n]*expt_ln_pi[k]
@@ -130,8 +130,8 @@ function calc_ELBO(X::Array{Float64, 2}, pri::BGMM, pos::BGMM)
     # -<ln q(S)>
     expt_ln_lkh -= sum(expt_S.*ln_expt_S)
     
-    KL_mu_Lambda = [(0.5*D*(log(pos.cmp[k].beta) - log(pri.cmp[k].beta) + pri.cmp[k].beta/pos.cmp[k].beta - pos.cmp[k].nu - 1)
-                     + 0.5*(pos.cmp[k].nu-pri.cmp[k].nu)*(sumdigamma(pos.cmp[k].nu, D) + D*log(2) + logdet(pos.cmp[k].W))
+    KL_mu_Lambda = [(0.5*D*(log.(pos.cmp[k].beta) - log.(pri.cmp[k].beta) + pri.cmp[k].beta/pos.cmp[k].beta - pos.cmp[k].nu - 1)
+                     + 0.5*(pos.cmp[k].nu-pri.cmp[k].nu)*(sumdigamma(pos.cmp[k].nu, D) + D*log.(2) + logdet(pos.cmp[k].W))
                      + logCw(pos.cmp[k].nu, pos.cmp[k].W) - logCw(pri.cmp[k].nu, pri.cmp[k].W)
                      + 0.5*pos.cmp[k].nu*trace((pri.cmp[k].beta*(pos.cmp[k].m-pri.cmp[k].m)*(pos.cmp[k].m-pri.cmp[k].m)'
                                                 +inv(pri.cmp[k].W))*pos.cmp[k].W)) for k in 1 : K]
@@ -214,7 +214,7 @@ function sample_S_GS(gmm::GMM, X::Matrix{Float64})
     K = gmm.K
     S = zeros(K, N)
 
-    tmp = [0.5*logdet(gmm.cmp[k].Lambda) + log(gmm.phi[k]) for k in 1 : K]
+    tmp = [0.5*logdet(gmm.cmp[k].Lambda) + log.(gmm.phi[k]) for k in 1 : K]
 
     for n in 1 : N
         tmp_ln_phi = [-0.5*trace(gmm.cmp[k].Lambda*(X[:,n] - gmm.cmp[k].mu)*(X[:,n] - gmm.cmp[k].mu)') + tmp[k] for k in 1 : K]
@@ -237,7 +237,7 @@ function calc_ln_ST(Xn::Vector{Float64}, gw::GW)
 end
 
 function sample_Sn(Xn::Vector{Float64}, bgmm::BGMM)
-    ln_tmp = [(calc_ln_ST(Xn, bgmm.cmp[k]) + log(bgmm.alpha[k])) for k in 1 : bgmm.K]
+    ln_tmp = [(calc_ln_ST(Xn, bgmm.cmp[k]) + log.(bgmm.alpha[k])) for k in 1 : bgmm.K]
     ln_tmp = ln_tmp -  logsumexp(ln_tmp)
     Sn = categorical_sample(exp.(ln_tmp))
     return Sn
