@@ -20,7 +20,6 @@ Pxx, freqs, t, pl = specgram(data[10000:318000,2], Fs=fs, NFFT=256, noverlap=0)
 xlabel("time [sec]")
 ylabel("frequency [Hz]")
 ylim([0,22000])
-show()
 
 # model
 D, N = size(Pxx)
