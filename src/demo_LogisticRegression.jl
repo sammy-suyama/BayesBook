@@ -6,12 +6,6 @@ using Distributions
 push!(LOAD_PATH, ".")
 import LogisticRegression
 
-PyDict(matplotlib["rcParams"])["mathtext.fontset"] = "cm"
-PyDict(matplotlib["rcParams"])["mathtext.rm"] = "serif"
-PyDict(matplotlib["rcParams"])["lines.linewidth"] = 1.5
-PyDict(matplotlib["rcParams"])["font.family"] = "TakaoPGothic"
-
-
 """
 Visualize prediction via surface (only for 2D inputs.)
 """
@@ -36,7 +30,7 @@ function visualize_surface(mu, rho, X, Y, text)
     val = [x1grid[:] x2grid[:]]'
 
     z_list = []
-    sigma = log(1 + exp(rho))
+    sigma = log(1 + exp.(rho))
     for n in 1 : N
         W = rand(MvNormal(mu, diagm(sigma.^2)))
         z_tmp = [LogisticRegression.sigmoid(W'*val[:,i]) for i in 1 : size(val, 2)]
@@ -46,7 +40,7 @@ function visualize_surface(mu, rho, X, Y, text)
     zgrid = reshape(z, R, R)
 
     # 3D plot
-    figure("prediction")
+    figure("surface")
     clf()
     plot_surface(x1grid, x2grid, zgrid, alpha=0.5)
     scatter3D(X[1,Y.==1], X[2,Y.==1], Y[Y.==1]+0.01, c="r", depthshade=true)
@@ -76,7 +70,7 @@ function visualize_contour(mu, rho, X, Y)
 
     z_list = []
     W_list = []
-    sigma = log(1 + exp(rho))
+    sigma = log(1 + exp.(rho))
     for n in 1 : N
         W = rand(MvNormal(mu, diagm(sigma.^2)))
         z_tmp = [LogisticRegression.sigmoid(W'*val[:,i]) for i in 1 : size(val, 2)]
@@ -93,8 +87,8 @@ function visualize_contour(mu, rho, X, Y)
     scatter(X[1,Y.==1], X[2,Y.==1], c="r")
     scatter(X[1,Y.==0], X[2,Y.==0], c="b")
     xlim([xmin, xmax])
-    ylim([ymin, ymax])    
-    title("予測確率")
+    ylim([ymin, ymax])
+    title("prediction")
 
     # parameter samples
     figure("samples")
@@ -106,7 +100,7 @@ function visualize_contour(mu, rho, X, Y)
     scatter(X[1,Y.==0]', X[2,Y.==0]', c="b")
     xlim([xmin, xmax])
     ylim([ymin, ymax])
-    title("境界線のサンプル")
+    title("parameter samples")
 end
 
 function draw_line(W, xmin, xmax)

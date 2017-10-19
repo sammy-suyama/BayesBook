@@ -116,7 +116,7 @@ Compute variational posterior distributions.
 """
 function VI(Y::Array{Float64, 2}, prior::DRModel, max_iter::Int)
     X, XX = init(Y, prior)
-    mask = isnan(Y)
+    mask = isnan.(Y)
     sum_nan = sum(mask)
     posterior = deepcopy(prior)
 

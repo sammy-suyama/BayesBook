@@ -62,7 +62,7 @@ function test()
     N = 50 # data size
     X = 2*rand(M, N) - 0.0 # input
     X[2,:] = 1.0 # bias
-    Y = 0.5*sin(2*pi * X[1,:]/3) + 0.05 * randn(N)    
+    Y = 0.5*sin.(2*pi * X[1,:]/3) + 0.05 * randn(N)    
     
     # model parameters
     K = 5

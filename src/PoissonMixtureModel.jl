@@ -2,7 +2,7 @@
 Bayesian Poisson Mixture Model
 """
 module PoissonMixtureModel
-using StatsFuns.logsumexp
+using StatsFuns.logsumexp, SpecialFunctions.digamma
 using Distributions
 
 export Gam, BPMM, Poi, PMM
@@ -91,7 +91,7 @@ end
 
 function calc_ELBO(X::Matrix{Float64}, pri::BPMM, pos::BPMM)
     ln_expt_S = update_S(pos, X)
-    expt_S = exp(ln_expt_S)
+    expt_S = exp.(ln_expt_S)
     K, N = size(expt_S)
     D = size(X, 1)
 
@@ -99,28 +99,28 @@ function calc_ELBO(X::Matrix{Float64}, pri::BPMM, pos::BPMM)
     expt_lambda = zeros(D, K)
     expt_ln_lkh = 0
     for k in 1 : K
-        expt_ln_lambda[:,k] = digamma(pos.cmp[k].a) - log(pos.cmp[k].b)
+        expt_ln_lambda[:,k] = digamma.(pos.cmp[k].a) - log(pos.cmp[k].b)
         expt_lambda[:,k] = pos.cmp[k].a / pos.cmp[k].b
         for n in 1 : N
             expt_ln_lkh += expt_S[k,n] * (X[:, n]' * expt_ln_lambda[:,k]
-                                       - sum(expt_lambda[:,k]) - sum(lgamma(X[:,n]+1)))[1]
+                                       - sum(expt_lambda[:,k]) - sum(lgamma.(X[:,n]+1)))[1]
         end
     end
     
-    expt_ln_pS = sum(expt_S' * (digamma(pos.alpha) - digamma(sum(pos.alpha))))
+    expt_ln_pS = sum(expt_S' * (digamma.(pos.alpha) - digamma.(sum(pos.alpha))))
     expt_ln_qS = sum(expt_S .* ln_expt_S)
     
     KL_lambda = 0
     for k in 1 : K
         KL_lambda += (sum(pos.cmp[k].a)*log(pos.cmp[k].b) - sum(pri.cmp[k].a)*log(pri.cmp[k].b)
-                      - sum(lgamma(pos.cmp[k].a)) + sum(lgamma(pri.cmp[k].a))
+                      - sum(lgamma.(pos.cmp[k].a)) + sum(lgamma.(pri.cmp[k].a))
                       + (pos.cmp[k].a - pri.cmp[k].a)' * expt_ln_lambda[:,k]
                       + (pri.cmp[k].b - pos.cmp[k].b) * sum(expt_lambda[:,k])
                       )[1]
     end
-    KL_pi = (lgamma(sum(pos.alpha)) - lgamma(sum(pri.alpha))
-             - sum(lgamma(pos.alpha)) + sum(lgamma(pri.alpha))
-             + (pos.alpha - pri.alpha)' * (digamma(pos.alpha) - digamma(sum(pos.alpha)))
+    KL_pi = (lgamma.(sum(pos.alpha)) - lgamma.(sum(pri.alpha))
+             - sum(lgamma.(pos.alpha)) + sum(lgamma.(pri.alpha))
+             + (pos.alpha - pri.alpha)' * (digamma.(pos.alpha) - digamma.(sum(pos.alpha)))
              )[1]
     
     VB = expt_ln_lkh + expt_ln_pS - expt_ln_qS - (KL_lambda + KL_pi)
@@ -153,12 +153,12 @@ function update_S(bpmm::BPMM, X::Matrix{Float64})
     ln_expt_S = zeros(K, N)
     tmp = zeros(K)
 
-    sum_digamma_tmp = digamma(sum(bpmm.alpha))
+    sum_digamma_tmp = digamma.(sum(bpmm.alpha))
     for k in 1 : K
         tmp[k] = - sum(bpmm.cmp[k].a) / bpmm.cmp[k].b
-        tmp[k] += digamma(bpmm.alpha[k]) - sum_digamma_tmp
+        tmp[k] += digamma.(bpmm.alpha[k]) - sum_digamma_tmp
     end
-    ln_lambda_X = [X'*(digamma(bpmm.cmp[k].a) - log(bpmm.cmp[k].b)) for k in 1 : K]
+    ln_lambda_X = [X'*(digamma.(bpmm.cmp[k].a) - log(bpmm.cmp[k].b)) for k in 1 : K]
     for n in 1 : N
         tmp_ln_pi =  [tmp[k] + ln_lambda_X[k][n] for k in 1 : K]
         ln_expt_S[:,n] = tmp_ln_pi - logsumexp(tmp_ln_pi)
@@ -190,7 +190,7 @@ function sample_S_GS(pmm::PMM, X::Matrix{Float64})
     for n in 1 : N
         tmp_ln_phi = [(tmp[k] + ln_lambda_X[k][n])::Float64 for k in 1 : K]
         tmp_ln_phi = tmp_ln_phi - logsumexp(tmp_ln_phi)
-        S[:,n] = categorical_sample(exp(tmp_ln_phi))
+        S[:,n] = categorical_sample(exp.(tmp_ln_phi))
     end
     return S
 end
@@ -199,8 +199,8 @@ end
 ## used for Collapsed Gibbs Sampling
 function calc_ln_NB(Xn::Vector{Float64}, gam::Gam)
     ln_lkh = [(gam.a[d]*log(gam.b)
-               - lgamma(gam.a[d])
-               + lgamma(Xn[d] + gam.a[d])
+               - lgamma.(gam.a[d])
+               + lgamma.(Xn[d] + gam.a[d])
                - (Xn[d] + gam.a[d])*log(gam.b + 1)
                )::Float64 for d in 1 : size(Xn, 1)]
     return sum(ln_lkh)
@@ -209,7 +209,7 @@ end
 function sample_Sn(Xn::Vector{Float64}, bpmm::BPMM)
     ln_tmp = [(calc_ln_NB(Xn, bpmm.cmp[k]) + log(bpmm.alpha[k])) for k in 1 : bpmm.K]
     ln_tmp = ln_tmp -  logsumexp(ln_tmp)
-    Sn = categorical_sample(exp(ln_tmp))
+    Sn = categorical_sample(exp.(ln_tmp))
     return Sn
 end
 
@@ -241,7 +241,7 @@ function learn_VI(X::Matrix{Float64}, prior_bpmm::BPMM, max_iter::Int)
     # inference
     for i in 1 : max_iter
         # E-step
-        expt_S = exp(update_S(bpmm, X))
+        expt_S = exp.(update_S(bpmm, X))
         # M-step
         bpmm = add_stats(prior_bpmm, X, expt_S)
         # calc VB

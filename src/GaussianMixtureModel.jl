@@ -2,8 +2,7 @@
 Bayesian Gaussian Mixture Model
 """
 module GaussianMixtureModel
-
-using StatsFuns.logsumexp
+using StatsFuns.logsumexp, SpecialFunctions.digamma
 using Distributions
 using PDMats
 
@@ -86,7 +85,7 @@ end
 function sumdigamma(nu, D)
     ret = 0.0
     for d in 1 : D
-        ret += digamma(0.5*(nu + 1 - d))
+        ret += digamma.(0.5*(nu + 1 - d))
     end
     return ret
 end
@@ -101,11 +100,11 @@ end
 function calc_ELBO(X::Array{Float64, 2}, pri::BGMM, pos::BGMM)
     function logCw(nu, W)
         D = size(W, 1)
-        return -0.5*nu*logdet(W) - 0.5*nu*D*log(2) - 0.25*D*(D-1)*log(pi) - sum([lgamma(0.5*(nu+1-d)) for d in 1 : D])
+        return -0.5*nu*logdet(W) - 0.5*nu*D*log(2) - 0.25*D*(D-1)*log(pi) - sum([lgamma.(0.5*(nu+1-d)) for d in 1 : D])
     end
     
     ln_expt_S = update_S(pos, X)
-    expt_S = exp(ln_expt_S)
+    expt_S = exp.(ln_expt_S)
     K, N = size(expt_S)
     D = size(X, 1)
 
@@ -115,7 +114,7 @@ function calc_ELBO(X::Array{Float64, 2}, pri::BGMM, pos::BGMM)
         expt_Lambda_mu = pos.cmp[k].nu * pos.cmp[k].W * pos.cmp[k].m
         expt_mu_Lambda_mu = (pos.cmp[k].nu * pos.cmp[k].m' * pos.cmp[k].W * pos.cmp[k].m)[1] + D/pos.cmp[k].beta
         expt_ln_Lambda = sumdigamma(pos.cmp[k].nu, D) + D*log(2) + logdet(pos.cmp[k].W)
-        expt_ln_pi = digamma(pos.alpha) - digamma(sum(pos.alpha))
+        expt_ln_pi = digamma.(pos.alpha) - digamma.(sum(pos.alpha))
         for n in 1 : N
             # <ln p(X|S, mu, Lambda)>
             expt_ln_lkh += -0.5 * expt_S[k,n]*(trace(X[:,n]*X[:,n]'*expt_Lambda)
@@ -137,9 +136,9 @@ function calc_ELBO(X::Array{Float64, 2}, pri::BGMM, pos::BGMM)
                      + 0.5*pos.cmp[k].nu*trace((pri.cmp[k].beta*(pos.cmp[k].m-pri.cmp[k].m)*(pos.cmp[k].m-pri.cmp[k].m)'
                                                 +inv(pri.cmp[k].W))*pos.cmp[k].W)) for k in 1 : K]
     
-    KL_pi = (lgamma(sum(pos.alpha)) - lgamma(sum(pri.alpha))
-             - sum(lgamma(pos.alpha)) + sum(lgamma(pri.alpha))
-             + (pos.alpha - pri.alpha)' * (digamma(pos.alpha) - digamma(sum(pos.alpha)))
+    KL_pi = (lgamma.(sum(pos.alpha)) - lgamma.(sum(pri.alpha))
+             - sum(lgamma.(pos.alpha)) + sum(lgamma.(pri.alpha))
+             + (pos.alpha - pri.alpha)' * (digamma.(pos.alpha) - digamma.(sum(pos.alpha)))
              )[1]
 
     VB = expt_ln_lkh - (sum(KL_mu_Lambda) + KL_pi)
@@ -179,12 +178,12 @@ function update_S(bgmm::BGMM, X::Matrix{Float64})
     tmp = zeros(K)
 
     tmp = NaN * zeros(K)
-    sum_digamma_tmp = digamma(sum(bgmm.alpha))
+    sum_digamma_tmp = digamma.(sum(bgmm.alpha))
     for k in 1 : K
         tmp[k] = -0.5*(bgmm.cmp[k].nu*trace(bgmm.cmp[k].m*bgmm.cmp[k].m'*bgmm.cmp[k].W)
                        + D*(1.0/bgmm.cmp[k].beta)
                        - (sumdigamma(bgmm.cmp[k].nu, D) + logdet(bgmm.cmp[k].W)))
-        tmp[k] += digamma(bgmm.alpha[k]) - sum_digamma_tmp
+        tmp[k] += digamma.(bgmm.alpha[k]) - sum_digamma_tmp
     end
     for n in 1 : N
         tmp_ln_pi = NaN * zeros(K)
@@ -220,7 +219,7 @@ function sample_S_GS(gmm::GMM, X::Matrix{Float64})
     for n in 1 : N
         tmp_ln_phi = [-0.5*trace(gmm.cmp[k].Lambda*(X[:,n] - gmm.cmp[k].mu)*(X[:,n] - gmm.cmp[k].mu)') + tmp[k] for k in 1 : K]
         tmp_ln_phi = tmp_ln_phi - logsumexp(tmp_ln_phi)
-        S[:,n] = categorical_sample(exp(tmp_ln_phi))
+        S[:,n] = categorical_sample(exp.(tmp_ln_phi))
     end
     
     return S
@@ -240,7 +239,7 @@ end
 function sample_Sn(Xn::Vector{Float64}, bgmm::BGMM)
     ln_tmp = [(calc_ln_ST(Xn, bgmm.cmp[k]) + log(bgmm.alpha[k])) for k in 1 : bgmm.K]
     ln_tmp = ln_tmp -  logsumexp(ln_tmp)
-    Sn = categorical_sample(exp(ln_tmp))
+    Sn = categorical_sample(exp.(ln_tmp))
     return Sn
 end
 
@@ -272,7 +271,7 @@ function learn_VI(X::Matrix{Float64}, prior_bgmm::BGMM, max_iter::Int)
     # inference
     for i in 1 : max_iter
         # E-step
-        expt_S = exp(update_S(bgmm, X))
+        expt_S = exp.(update_S(bgmm, X))
         # M-step
         bgmm = add_stats(prior_bgmm, X, expt_S)
         # calc VB

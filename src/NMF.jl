@@ -3,7 +3,7 @@ Variational inference for Bayesian NMF
 """
 module NMF
 using Distributions
-using StatsFuns.logsumexp
+using StatsFuns.logsumexp, SpecialFunctions.digamma
 
 export NMFModel
 export sample_data, VI
@@ -48,11 +48,11 @@ function update_S(X::Array{Float64, 2}, A_t::Array{Float64, 2}, B_t::Array{Float
     for d in 1 : D
         for n in 1 : N
             # K dim
-            ln_P = (digamma(A_t[d,:]) + log(B_t[d,:])
-                    + digamma(A_v[:,n]) + log(B_v[:,n])
+            ln_P = (digamma.(A_t[d,:]) + log.(B_t[d,:])
+                    + digamma.(A_v[:,n]) + log.(B_v[:,n])
                     )
             ln_P = ln_P - logsumexp(ln_P)
-            S[d,:,n] = X[d,n] * exp(ln_P)
+            S[d,:,n] = X[d,n] * exp.(ln_P)
         end
     end
     return S

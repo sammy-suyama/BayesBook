@@ -4,10 +4,6 @@
 using PyPlot, PyCall
 using DataFrames
 using Distributions
-PyDict(matplotlib["rcParams"])["mathtext.fontset"] = "cm"
-PyDict(matplotlib["rcParams"])["mathtext.rm"] = "serif"
-PyDict(matplotlib["rcParams"])["lines.linewidth"] = 1.5
-PyDict(matplotlib["rcParams"])["font.family"] = "TakaoPGothic"
 
 push!(LOAD_PATH, ".")
 import NMF

@@ -7,7 +7,7 @@ using Distributions
 export sigmoid, sample_data, VI
 
 function sigmoid(x)
-    return 1.0 / (1.0 + exp(-x[1]))
+    return 1.0 / (1.0 + exp.(-x[1]))
 end    
 
 function bern_sample(mu)
@@ -37,7 +37,7 @@ Compute variational parameters.
 """
 function VI(Y, X, M, Sigma_w, alpha, max_iter)
     function rho2sig(rho)
-        return log(1 + exp(rho))
+        return log(1 + exp.(rho))
     end
     
     function compute_df_dw(Y, X, Sigma_w, mu, rho, W)
@@ -60,24 +60,24 @@ function VI(Y, X, M, Sigma_w, alpha, max_iter)
     end
     
     function compute_dprec_drho(rho)
-        return 2 * rho2sig(rho) .^ (-3) .* (1 ./ (1+exp(rho))).^2 .* (1 ./ (1+exp(-rho)))
+        return 2 * rho2sig(rho) .^ (-3) .* (1 ./ (1+exp.(rho))).^2 .* (1 ./ (1+exp.(-rho)))
     end
 
     # diag gaussian for approximate posterior
     mu = randn(M)
-    rho = randn(M) # sigma = log(1 + exp(rho))
+    rho = randn(M) # sigma = log(1 + exp.(rho))
     
     for i in 1 : max_iter
         # sample epsilon
         ep = rand(M)
-        W_tmp = mu + log(1 + exp(rho)) .* ep
+        W_tmp = mu + log(1 + exp.(rho)) .* ep
 
         # calculate gradient
         df_dw = compute_df_dw(Y, X, Sigma_w, mu, rho, W_tmp)
         df_dmu = compute_df_dmu(mu, rho, W_tmp)
         df_drho = compute_df_drho(Y, X, Sigma_w, mu, rho, W_tmp)
         d_mu = df_dw + df_dmu
-        d_rho = df_dw .* (ep ./ (1+exp(-rho))) + df_drho
+        d_rho = df_dw .* (ep ./ (1+exp.(-rho))) + df_drho
 
         # update variational parameters
         mu = mu - alpha * d_mu

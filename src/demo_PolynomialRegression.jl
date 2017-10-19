@@ -2,7 +2,6 @@
 ## Bayesian model selection demo
 ## for polynomial regression
 
-
 using PyPlot, PyCall
 using Distributions
 
@@ -44,8 +43,8 @@ function test()
     N = 10
     sig2_y = 0.1
     X = 2*pi*rand(N)
-    Y_true = [sin(x) for x in X_lin]
-    Y_obs = [sin(x) + sig2_y * randn() for x in X]
+    Y_true = [sin.(x) for x in X_lin]
+    Y_obs = [sin.(x) + sig2_y * randn() for x in X]
     
     dims = [1, 2, 3, 4, 5, 10]
     

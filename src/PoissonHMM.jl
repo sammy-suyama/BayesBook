@@ -2,7 +2,7 @@
 Bayesian 1dim Poisson Hidden Markov Model
 """
 module PoissonHMM
-using StatsFuns.logsumexp
+using StatsFuns.logsumexp, SpecialFunctions.digamma
 using Distributions
 
 export Gam, GHMM, Poi, HMM
@@ -138,7 +138,7 @@ function update_Z(bhmm::BHMM, X::Vector{Float64}, Z::Matrix{Float64})
 
     ln_lkh = zeros(K, N)
     for k in 1 : K
-        ln_lambda = digamma(bhmm.cmp[k].a) - log(bhmm.cmp[k].b)
+        ln_lambda = digamma.(bhmm.cmp[k].a) - log(bhmm.cmp[k].b)
         lambda = bhmm.cmp[k].a / bhmm.cmp[k].b
         for n in 1 : N
             ln_lkh[k,n] = X[n]'*(ln_lambda) - lambda
@@ -147,36 +147,36 @@ function update_Z(bhmm::BHMM, X::Vector{Float64}, Z::Matrix{Float64})
     
     expt_ln_A = zeros(size(bhmm.alpha_A))
     for k in 1 : K
-        expt_ln_A[:,k] = digamma(bhmm.alpha_A[:,k]) - digamma(sum(bhmm.alpha_A[:,k]))
+        expt_ln_A[:,k] = digamma.(bhmm.alpha_A[:,k]) - digamma.(sum(bhmm.alpha_A[:,k]))
     end
 
     # copy
     ln_expt_Z = log(Z)
     
     # n = 1
-    ln_expt_Z[:,1] = (digamma(bhmm.alpha_phi) - digamma(sum(bhmm.alpha_phi))
-                      + expt_ln_A' * exp(ln_expt_Z[:,2])
+    ln_expt_Z[:,1] = (digamma.(bhmm.alpha_phi) - digamma.(sum(bhmm.alpha_phi))
+                      + expt_ln_A' * exp.(ln_expt_Z[:,2])
                       + ln_lkh[:,1]
                       )
     ln_expt_Z[:,1] = ln_expt_Z[:,1] - logsumexp(ln_expt_Z[:,1])
     
     # 2 <= n <= N - 1
     for n in 2 : N - 1
-        ln_expt_Z[:,n] =( expt_ln_A * exp(ln_expt_Z[:,n-1])
-                          + expt_ln_A' * exp(ln_expt_Z[:,n+1])
+        ln_expt_Z[:,n] =( expt_ln_A * exp.(ln_expt_Z[:,n-1])
+                          + expt_ln_A' * exp.(ln_expt_Z[:,n+1])
                           + ln_lkh[:,n]
                           )
         ln_expt_Z[:,n] = ln_expt_Z[:,n] - logsumexp(ln_expt_Z[:,n])
     end
     
     # n = N
-    ln_expt_Z[:,N] =( expt_ln_A * exp(ln_expt_Z[:,N-1])
+    ln_expt_Z[:,N] =( expt_ln_A * exp.(ln_expt_Z[:,N-1])
                       + ln_lkh[:,N]
                       )
     ln_expt_Z[:,N] = ln_expt_Z[:,N] - logsumexp(ln_expt_Z[:,N])
     
     # calc output
-    Z_ret = exp(ln_expt_Z)
+    Z_ret = exp.(ln_expt_Z)
     ZZ_ret = [zeros(K,K) for _ in 1 : N - 1]
     for n in 1 : N - 1
         ZZ_ret[n] = Z_ret[:,n+1] * Z_ret[:,n]'
@@ -215,16 +215,16 @@ function update_Z_fb(bhmm::BHMM, X::Vector{Float64})
     # calc likelihood
     ln_lik = zeros(K, N)
     for k in 1 : K
-        ln_lambda = digamma(bhmm.cmp[k].a) - log(bhmm.cmp[k].b)
+        ln_lambda = digamma.(bhmm.cmp[k].a) - log(bhmm.cmp[k].b)
         lambda = bhmm.cmp[k].a / bhmm.cmp[k].b
         for n in 1 : N
             ln_lik[k,n] =X[n]'*(ln_lambda) - lambda                
         end
     end
-    expt_ln_phi = digamma(bhmm.alpha_phi) - digamma(sum(bhmm.alpha_phi))
+    expt_ln_phi = digamma.(bhmm.alpha_phi) - digamma.(sum(bhmm.alpha_phi))
     expt_ln_A = zeros(K,K)
     for k in 1 : K
-        expt_ln_A[:,k] = digamma(bhmm.alpha_A[:,k]) - digamma(sum(bhmm.alpha_A[:,k]))
+        expt_ln_A[:,k] = digamma.(bhmm.alpha_A[:,k]) - digamma.(sum(bhmm.alpha_A[:,k]))
     end
 
     Z, ZZ = fb_alg(ln_lik, expt_ln_phi, expt_ln_A)
@@ -266,7 +266,7 @@ function fb_alg(ln_lik::Matrix{Float64}, ln_phi::Vector{Float64}, ln_A::Matrix{F
             ln_ZZ[:,:,t] = ln_ZZ[:,:,t] - ln_st[t+1]
         end
     end
-    return exp(ln_Z), exp(ln_ZZ)
+    return exp.(ln_Z), exp.(ln_ZZ)
 end
 
 """

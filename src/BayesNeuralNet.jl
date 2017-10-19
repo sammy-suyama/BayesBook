@@ -1,22 +1,22 @@
 """
 Variational inference for Bayesian neural network
 """
-module BayesNeuralNet
+module BayesNeuralNetx
 using Distributions
 
 export sample_data_from_prior, sample_data_from_posterior
 export VI
 
 function sigmoid(x)
-    return 1.0 / (1.0 + exp(-x[1]))
+    return 1.0 / (1.0 + exp.(-x[1]))
 end
 
 function tanh(x)
-    return (exp(x) - exp(-x)) ./ (exp(x) + exp(-x))
+    return (exp.(x) - exp.(-x)) ./ (exp.(x) + exp.(-x))
 end
 
 function rho2sig(rho)
-    return log(1 + exp(rho))
+    return log(1 + exp.(rho))
 end
 
 function compute_df_dmu(mu, rho, W)
@@ -28,7 +28,7 @@ function compute_df_drho(Y, X, mu, rho, W)
 end
 
 function compute_dprec_drho(rho)
-    return 2 * rho2sig(rho) .^ (-3) .* (1 ./ (1+exp(rho))).^2 .* (1 ./ (1+exp(-rho)))
+    return 2 * rho2sig(rho) .^ (-3) .* (1 ./ (1+exp.(rho))).^2 .* (1 ./ (1+exp.(-rho)))
 end
 
 function compute_df_dw(Y, X, sigma2_y, sigma2_w, mu1, rho1, W1, mu2, rho2, W2)
@@ -77,9 +77,9 @@ Sample data given posterior and inputs.
 function sample_data_from_posterior(X, mu1, rho1, mu2, rho2, sigma2_y, D)
     N = size(X, 2)
     ep1 = randn(size(mu1))
-    W1_tmp = mu1 + log(1 + exp(rho1)) .* ep1
+    W1_tmp = mu1 + log(1 + exp.(rho1)) .* ep1
     ep2 = randn(size(mu2))
-    W2_tmp = mu2 + log(1 + exp(rho2)) .* ep2    
+    W2_tmp = mu2 + log(1 + exp.(rho2)) .* ep2    
     Y_est = [W2_tmp'* tanh(W1_tmp'X[:,n]) for n in 1 : N]
     Y_obs = [W2_tmp'* tanh(W1_tmp'X[:,n]) + sqrt(sigma2_y)*randn(D)  for n in 1 : N]
     return Y_est, Y_obs
@@ -101,9 +101,9 @@ function VI(Y, X, sigma2_w, sigma2_y, K, alpha, max_iter)
     for i in 1 : max_iter
         # sample
         ep1 = randn(size(mu1))
-        W1_tmp = mu1 + log(1 + exp(rho1)) .* ep1
+        W1_tmp = mu1 + log(1 + exp.(rho1)) .* ep1
         ep2 = randn(size(mu2))
-        W2_tmp = mu2 + log(1 + exp(rho2)) .* ep2
+        W2_tmp = mu2 + log(1 + exp.(rho2)) .* ep2
         
         # calc error
         df_dw1, df_dw2 = compute_df_dw(Y, X, sigma2_y, sigma2_w, mu1, rho1, W1_tmp, mu2, rho2, W2_tmp)
@@ -112,7 +112,7 @@ function VI(Y, X, sigma2_w, sigma2_y, K, alpha, max_iter)
         df_dmu1 = compute_df_dmu(mu1, rho1, W1_tmp)
         df_drho1 = compute_df_drho(Y, X, mu1, rho1, W1_tmp)
         d_mu1 = df_dw1 + df_dmu1
-        d_rho1 = df_dw1 .* (ep1 ./ (1+exp(-rho1))) + df_drho1
+        d_rho1 = df_dw1 .* (ep1 ./ (1+exp.(-rho1))) + df_drho1
         mu1 = mu1 - alpha * d_mu1
         rho1 = rho1 - alpha * d_rho1 
         
@@ -120,7 +120,7 @@ function VI(Y, X, sigma2_w, sigma2_y, K, alpha, max_iter)
         df_dmu2 = compute_df_dmu(mu2, rho2, W2_tmp)
             df_drho2 = compute_df_drho(Y, X, mu2, rho2, W2_tmp)
         d_mu2 = df_dw2 + df_dmu2
-        d_rho2 = df_dw2 .* (ep2 ./ (1+exp(-rho2))) + df_drho2
+        d_rho2 = df_dw2 .* (ep2 ./ (1+exp.(-rho2))) + df_drho2
         mu2 = mu2 - alpha * d_mu2
         rho2 = rho2 - alpha * d_rho2
     end

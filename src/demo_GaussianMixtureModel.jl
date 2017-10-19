@@ -31,7 +31,6 @@ function visualize_2D(X::Matrix{Float64}, S::Matrix{Float64}, S_est::Matrix{Floa
     end
 
     ax2[:set_title]("estimation")
-    show()
 end
 
 """

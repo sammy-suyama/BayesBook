@@ -56,8 +56,8 @@ function plot_gaussian(Mu, Sigma, col, label)
     c = 1.0
     a = sqrt(c*val[1])
     b = sqrt(c*val[2])
-    P1 = a*cos(w)
-    P2 = b*sin(w)
+    P1 = a*cos.(w)
+    P2 = b*sin.(w)
     P = Mu .+ vec'*vcat(P1', P2')
     plot(P[1, :], P[2, :], "-", color=col, label=label)
 end
@@ -69,8 +69,8 @@ function main_VI()
     ## creat truth distribution
     D = 2 # dimension
     theta = 2.0*pi/12 # tilt
-    A = reshape([cos(theta), -sin(theta),
-                 sin(theta), cos(theta)],
+    A = reshape([cos.(theta), -sin.(theta),
+                 sin.(theta), cos.(theta)],
                 2, 2)
     mu = [0.0, 0.0]
     lambda = inv(A * inv(reshape([1,0,0,10], 2, 2)) * A')
@@ -127,8 +127,8 @@ function main_GS()
     ## creat truth distribution
     D = 2 # dimension
     theta = 2.0*pi/12 # tilt
-    A = reshape([cos(theta), -sin(theta),
-                 sin(theta), cos(theta)],
+    A = reshape([cos.(theta), -sin.(theta),
+                 sin.(theta), cos.(theta)],
                 2, 2)
     mu = [0.0, 0.0]
     #lambda = inv(A * inv(reshape([1,0,0,10], 2, 2)) * A')
