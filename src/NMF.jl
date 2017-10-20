@@ -10,7 +10,7 @@ export sample_data, VI
 
 ####################
 ## Types
-type NMFModel
+struct NMFModel
     a_t::Array{Float64, 2} # D x K
     b_t::Array{Float64, 2} # D x L
     a_v::Float64 # 1 dim

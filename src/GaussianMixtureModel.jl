@@ -12,7 +12,7 @@ export learn_GS, learn_CGS, learn_VI
 
 ####################
 ## Types
-type GW
+struct GW
     # Parameters of Gauss Wisahrt distribution
     beta::Float64
     m::Vector{Float64}
@@ -20,7 +20,7 @@ type GW
     W::Matrix{Float64}
 end
 
-type BGMM
+struct BGMM
     # Parameters of Bayesian Gaussian Mixture Model 
     D::Int
     K::Int
@@ -28,13 +28,13 @@ type BGMM
     cmp::Vector{GW}
 end
 
-type Gauss
+struct Gauss
     # Parameters of Gauss Distribution
     mu::Vector{Float64}
     Lambda::Matrix{Float64}
 end
 
-type GMM
+struct GMM
     # Parameters of Gauss Mixture Model
     D::Int
     K::Int

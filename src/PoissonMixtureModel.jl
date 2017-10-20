@@ -11,13 +11,13 @@ export learn_GS, learn_CGS, learn_VI
 
 ####################
 ## Types
-type Gam
+struct Gam
     # Parameters of Gamma distribution
     a::Vector{Float64}
     b::Float64
 end
 
-type BPMM
+struct BPMM
     # Parameters of Bayesian Poisson Mixture Model 
     D::Int
     K::Int
@@ -25,12 +25,12 @@ type BPMM
     cmp::Vector{Gam}
 end
 
-type Poi
+struct Poi
     # Parameters of Poisson Distribution
     lambda::Vector{Float64}
 end
 
-type PMM
+struct PMM
     # Parameters of Poisson Mixture Model
     D::Int
     K::Int

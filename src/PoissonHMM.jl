@@ -11,14 +11,14 @@ export learn_VI
 
 ####################
 ## Types
-type Gam
+struct Gam
     # Parameters of Gamma distribution
     # 1dim
     a::Float64
     b::Float64
 end
 
-type BHMM
+struct BHMM
     # Parameters of Bayesian Bernoulli Mixture Model 
     K::Int
     alpha_phi::Vector{Float64}
@@ -26,13 +26,13 @@ type BHMM
     cmp::Vector{Gam}
 end
 
-type Poi
+struct Poi
     # Parameters of Poisson Distribution
     # 1 dim
     lambda::Float64
 end
 
-type HMM
+struct HMM
     # Parameters of Bernoulli Mixture Model
     K::Int
     phi::Vector{Float64}
