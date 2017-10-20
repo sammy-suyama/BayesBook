@@ -11,7 +11,7 @@ export sample_data, VI
 
 ####################
 ## Types
-type DRModel
+struct DRModel
     D::Int
     M::Int
     sigma2_y::Float64
