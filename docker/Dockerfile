@@ -4,7 +4,7 @@ FROM python:latest
 RUN apt-get update
 
 # install matplotlib
-RUN pip3 install matplotlib notebook
+RUN pip3 install matplotlib scipy scikit-learn notebook
 
 # hdf5-tools
 RUN apt-get install -y sudo hdf5-tools libzmq3
@@ -20,6 +20,9 @@ WORKDIR /work
 # add julia packages
 ADD add_packages.jl /work
 RUN julia add_packages.jl
+
+# download source codes
+RUN git clone https://github.com/sammy-suyama/BayesBook.git
 
 # Make port 8888 available to the world outside this container
 EXPOSE 8888
