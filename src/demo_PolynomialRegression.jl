@@ -32,7 +32,7 @@ function learn_bayes(X_raw, Y, M, sig2_y, Sig_w, X_lin)
                      + logdet(Sig_w)
                      - (mu_w_h'*inv(Sig_w_h)*mu_w_h)[1] - logdet(Sig_w_h)
                      )
-    return Y_est, sqrt(sig2_y_prd), evidence
+    return Y_est, sqrt.(sig2_y_prd), evidence
 end
 
 function test()
