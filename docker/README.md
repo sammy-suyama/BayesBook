@@ -6,7 +6,6 @@ Dockerのインストールに関しては公式サイトを参考ください�
 
 `Dockerfile`の置いてあるディレクトリで、イメージを作成・実行します。
 
-$ docker build -t bayesbook .
-
-$ docker run -p 8888:8888 bayesbook
+    $ docker build -t bayesbook .
+    $ docker run -p 8888:8888 bayesbook
 
