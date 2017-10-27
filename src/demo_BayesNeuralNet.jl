@@ -74,7 +74,7 @@ function test()
     alpha = 1.0e-5
     max_iter = 100000
     mu1, rho1, mu2, rho2 = BayesNeuralNet.VI(Y, X, sigma2_w, sigma2_y, K, alpha, max_iter)
-    Y_mean = [mu2'* tanh(mu1'X_lin[:,n]) for n in 1 : N_lin]
+    Y_mean = [mu2'* tanh.(mu1'X_lin[:,n]) for n in 1 : N_lin]
 
     ################
     # visualize        

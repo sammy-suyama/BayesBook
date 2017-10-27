@@ -11,10 +11,6 @@ function sigmoid(x)
     return 1.0 / (1.0 + exp.(-x[1]))
 end
 
-function tanh(x)
-    return (exp.(x) - exp.(-x)) ./ (exp.(x) + exp.(-x))
-end
-
 function rho2sig(rho)
     return log.(1 + exp.(rho))
 end
@@ -37,7 +33,7 @@ function compute_df_dw(Y, X, sigma2_y, sigma2_w, mu1, rho1, W1, mu2, rho2, W2)
     Y_err2 = zeros(size(W2)) # KxD
 
     for n in 1 : N
-        Z = tanh(W1'*X[:,n]) # Kx1
+        Z = tanh.(W1'*X[:,n]) # Kx1
         Y_est = W2'*Z
         # 2nd unit, Dx1
         delta2 = Y_est - Y[n]
@@ -63,10 +59,10 @@ function sample_data_from_prior(X, sigma2_w, sigma2_y, D, K)
     W2 = sqrt(sigma2_w) * randn(K, D)
     
     # sample function
-    Y = [W2'* tanh(W1'X[:,n]) for n in 1 : N]
+    Y = [W2'* tanh.(W1'X[:,n]) for n in 1 : N]
 
     # sample data
-    Y_obs = [W2'* tanh(W1'X[:,n]) + sqrt(sigma2_y)*randn(D) for n in 1 : N]
+    Y_obs = [W2'* tanh.(W1'X[:,n]) + sqrt(sigma2_y)*randn(D) for n in 1 : N]
 
     return Y_obs, Y, W1, W2
 end
@@ -80,8 +76,8 @@ function sample_data_from_posterior(X, mu1, rho1, mu2, rho2, sigma2_y, D)
     W1_tmp = mu1 + log.(1 + exp.(rho1)) .* ep1
     ep2 = randn(size(mu2))
     W2_tmp = mu2 + log.(1 + exp.(rho2)) .* ep2    
-    Y_est = [W2_tmp'* tanh(W1_tmp'X[:,n]) for n in 1 : N]
-    Y_obs = [W2_tmp'* tanh(W1_tmp'X[:,n]) + sqrt(sigma2_y)*randn(D)  for n in 1 : N]
+    Y_est = [W2_tmp'* tanh.(W1_tmp'X[:,n]) for n in 1 : N]
+    Y_obs = [W2_tmp'* tanh.(W1_tmp'X[:,n]) + sqrt(sigma2_y)*randn(D)  for n in 1 : N]
     return Y_est, Y_obs
 end
 
