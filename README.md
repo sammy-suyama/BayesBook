@@ -11,3 +11,6 @@
 * Python: https://www.python.org/
 * Matplotlib: https://matplotlib.org/
 * scikit-learn: http://scikit-learn.org/
+
+上記の環境構築が煩わしい場合にはDockerfileも用意しています．
+* Docker: https://docs.docker.com/ 
