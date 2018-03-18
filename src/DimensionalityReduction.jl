@@ -106,7 +106,7 @@ function update_X(Y::Array{Float64, 2}, posterior::DRModel)
     return X, XX
 end
 
-function interpolate(mask::Array{Bool, 2}, X::Array{Float64, 2}, posterior::DRModel)
+function interpolate(mask::BitArray{2}, X::Array{Float64, 2}, posterior::DRModel)
     Y_est = posterior.m_W'*X + repmat(posterior.m_mu, 1, size(X, 2))
     return return Y_est[mask]
 end
