@@ -28,7 +28,7 @@ function learn_bayes(X_raw, Y, M, sig2_y, Sig_w, X_lin)
     sig2_y_prd = sig2_y + diag(X_test'Sig_w_h*X_test)
     
     # calc evidence
-    evidence = -0.5*(sum(Y)*inv(sig2_y) + log.(sig2_y) + log.(2*pi)
+    evidence = -0.5*(sum(Y)*inv(sig2_y) +N*log.(sig2_y) + N*log.(2*pi)
                      + logdet(Sig_w)
                      - (mu_w_h'*inv(Sig_w_h)*mu_w_h)[1] - logdet(Sig_w_h)
                      )
