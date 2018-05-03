@@ -17,13 +17,13 @@ struct NMFModel
     b_v::Float64 # 1 dim
 end
 
-function sqsum(mat::Array{Float64}, idx)
+function sqsum(mat::Array, idx)
     return squeeze(sum(mat, idx), idx)
 end
 
 ####################
 ## functions
-function init(X::Array{Float64, 2}, model::NMFModel)
+function init(X::Array{Int64, 2}, model::NMFModel)
     D, N = size(X)
     K = size(model.a_t, 2)
     S = zeros(D, K, N)
@@ -41,7 +41,7 @@ function init(X::Array{Float64, 2}, model::NMFModel)
     return S, A_t, B_t, A_v, B_v
 end
 
-function update_S(X::Array{Float64, 2}, A_t::Array{Float64, 2}, B_t::Array{Float64, 2}, A_v::Array{Float64, 2}, B_v::Array{Float64, 2})
+function update_S(X::Array{Int64, 2}, A_t::Array{Float64, 2}, B_t::Array{Float64, 2}, A_v::Array{Float64, 2}, B_v::Array{Float64, 2})
     D, K = size(A_t)
     N = size(A_v, 2)
     S = zeros(D, K, N)
@@ -100,7 +100,8 @@ function sample_data(N::Int, model::NMFModel)
             end
         end
     end
-    X = sqsum(S, 2) + 0.0 # zero noise
+    #X = sqsum(S, 2) + 0.0 # zero noise
+    X = sqsum(S, 2)
     return X, T, S, V
 end
 
@@ -111,7 +112,7 @@ end
 """
 Compute variational posterior distributions.
 """
-function VI(X::Array{Float64, 2}, model::NMFModel, max_iter::Int)
+function VI(X::Array{Int64, 2}, model::NMFModel, max_iter::Int)
     K = size(model.a_t, 2)
     D, N = size(X)
     S, A_t, B_t, A_v, B_v = init(X, model)
