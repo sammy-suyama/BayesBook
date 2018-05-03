@@ -2,7 +2,8 @@
 
 「機械学習スタートアップシリーズ ベイズ推論による機械学習入門」のソースコードをアップしています。
 * http://www.kspub.co.jp/book/detail/1538320.html
-* 正誤表（第３刷まで） https://github.com/sammy-suyama/BayesBook/blob/master/pdf/seigo.pdf
+* 正誤表（第１～３刷まで） https://github.com/sammy-suyama/BayesBook/blob/master/pdf/seigo.pdf
+* 正誤表（第４刷まで） https://github.com/sammy-suyama/BayesBook/blob/master/pdf/seigo_v4.pdf
 
 ソースコードはJuliaで書かれています。（推奨Vesion:0.6.0）
 * The Julia Language: http://julialang.org/
