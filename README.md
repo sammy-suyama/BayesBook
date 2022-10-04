@@ -1,18 +1,21 @@
-# BayesBook
+# This branch
+教科書『須山 敦志 『ベイズ推論による機械学習 入門』(2017), 講談社』の第五章1節の線形次元削減をPythonで実装しました.
 
-「機械学習スタートアップシリーズ ベイズ推論による機械学習入門」のソースコードをアップしています。
-* http://www.kspub.co.jp/book/detail/1538320.html
-* 正誤表（第１～３刷まで） https://github.com/sammy-suyama/BayesBook/blob/master/pdf/seigo.pdf
-* 正誤表（第４刷まで） https://github.com/sammy-suyama/BayesBook/blob/master/pdf/seigo_v4.pdf
+# File
 
-ソースコードはJuliaで書かれています。（推奨Vesion:0.6.0）
-* The Julia Language: http://julialang.org/
-* Julia Documentation: http://docs.julialang.org/
+```
+.
+├── 02_LDR.ipynb : 色々な事前分布の比較
+├── 03_LDR.ipynb : 圧縮次元の比較
+├── 04_LDR.ipynb : 学習のデータサイズの変更による比較
+├── README.md
+└── bayes
+    ├── __init__.py
+    ├── model.py
+    ├── pdf.py
+    ├── posterior.py
+    └── prior.py
+```
 
-グラフの描画やテストデータのダウンロードに一部Pythonライブラリを利用しています。
-* Python: https://www.python.org/
-* Matplotlib: https://matplotlib.org/
-* scikit-learn: http://scikit-learn.org/
-
-上記の環境構築が煩わしい場合にはDockerfileも用意しています．
-* Docker: https://docs.docker.com/ 
+# Reference
+須山 敦志 『ベイズ推論による機械学習 入門』(2017), 講談社
