@@ -1,13 +1,10 @@
-from audioop import mul
-from turtle import forward
 from typing import Union
 
 import numpy as np
 
-from .prior import Prior
 from .pdf import PDF
 
-T = Union[Prior, np.ndarray]
+T = np.ndarray
 INF = 1e100
 
 class Model(PDF):
@@ -15,12 +12,12 @@ class Model(PDF):
     This class represents a predictive model p(x|w), such as N(x|mu,sigma).
 
     You can use this class as not only point estimation statistics but also bayesian statistics.
-
     """
     def __init__(self):
         super().__init__()
 
 class _LDR(Model):
+    """target class"""
     def __init__(self, w, x, mu, sigma):
         """
         This class represents a Linear Dimensionaly Reduction model.
@@ -103,24 +100,11 @@ class LDR(_LDR):
         mat_res = np.sum((mean@ np.linalg.inv(self.sigma**(-2)*np.eye(self.d))) * mean,axis = 1)
         return np.mean(mat_res)
 
-    def forward(self, y=None, is_train = True):
-        """
-        Args:
-            y (N, D):
-                This is input
-            is_train (bool, optional):
-                If the value is true, it uses x_mean for calculation directly.
-                If the value is false, it doesn't use x_mean for calculation directly.
-                
-                Defaults to True.
-        """
-        return None
-
     def optimize(self, epoch, valid = None, order = 0, is_print = True):
-        """
+        """optimize parameters.
+
         This order is following (6 pattern):
             0: mu -> w -> x
-
         Args:
             epoch (int):
             valid ((NN,D) shape np.ndarray):
@@ -131,7 +115,7 @@ class LDR(_LDR):
                 self.calc_w()
                 self.calc_x()
 
-                self.memorize(i, valid, is_print)
+                self.memorize(i, is_print)
         return None
 
     def calc_mu(self):
@@ -168,12 +152,12 @@ class LDR(_LDR):
         )
         self.x_mean = (self.sigma**(-2) * self.x_variance @ self.w_mean @ (self.y - self.mu_mean).T).T
 
-    def memorize(self, i, valid, is_print):
-        """
+    def memorize(self, i, is_print):
+        """memorize best parameters.
+
         Args:
-            i (_type_): _description_
-            valid (_type_): _description_
-            is_print (bool): _description_
+            i (int): number
+            is_print (bool):
         """
         tr_loss = self.calculate_logloss(y=self.y)
         va_loss = self.calculate_logloss(y=self.valid)
