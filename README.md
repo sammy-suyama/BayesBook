@@ -12,9 +12,7 @@
 └── bayes
     ├── __init__.py
     ├── model.py
-    ├── pdf.py
-    ├── posterior.py
-    └── prior.py
+    └── pdf.py
 ```
 
 # Reference
