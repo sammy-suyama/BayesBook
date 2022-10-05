@@ -8,5 +8,3 @@ class PDF:
     def __setattr__(self, name, value):
         super().__setattr__(name, value)
     
-    def __call__(self, *input):
-        return self.forward(*input)
